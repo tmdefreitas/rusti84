@@ -1,0 +1,6 @@
+[package]
+name = "rusti84"
+version = "0.1.0"
+authors = ["Timothy DeFreitas <timdef@broadinstitute.org>"]
+
+[dependencies]
