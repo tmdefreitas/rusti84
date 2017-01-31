@@ -68,3 +68,13 @@ mod lexer {
     }
 
 }
+
+#[cfg(test)]
+mod tests {
+    use super::lexer;
+
+    #[test]
+    fn it_works() {
+        assert!(lexer::tokenize("   ").is_empty());
+    }
+}
