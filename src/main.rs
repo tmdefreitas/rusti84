@@ -6,7 +6,7 @@ fn main() {
 mod lexer {
 
     //Valid Tokens
-    #[derive(Debug)]
+    #[derive(Debug, Eq, PartialEq)]
     pub enum Token {
         Integer(i64),
         PlusSign,
@@ -42,14 +42,14 @@ mod lexer {
             //Capture Integers (Only support base 10)
             //TODO: make this more idiomatic?
             if ch.is_digit(10) {
-                let mut int_value = ch.to_digit(10).expect("is_digit but not to_digit!");
+                let mut int_value = ch.to_digit(10).expect("is_digit but not to_digit!") as i64;
                 loop {
                     match chrs.peek() {
                         None => break,
                         Some(c) => {
                             // Check to see if the next symbol is a digit, if it is, keep going
                             match c.to_digit(10) {
-                                Some(d) => int_value = int_value * 10 + d,
+                                Some(d) => int_value = int_value * 10 + (d as i64),
                                 None => break
                             }
                         }
@@ -58,7 +58,7 @@ mod lexer {
                     chrs.next();
                 };
                 //Digit is done, push integer as token
-                tokens.push(Token::Integer(int_value as i64));
+                tokens.push(Token::Integer(int_value));
             }
 
         }
@@ -72,9 +72,31 @@ mod lexer {
 #[cfg(test)]
 mod tests {
     use super::lexer;
+    use super::lexer::Token::*;
 
     #[test]
-    fn it_works() {
+    fn all_whitespace() {
         assert!(lexer::tokenize("   ").is_empty());
+    }
+
+    #[test]
+    fn parse_expr(){
+        let parsed = lexer::tokenize("1 + 24 - 16");
+        let expected = vec![Integer(1), PlusSign, Integer(24), MinusSign, Integer(16)];
+        assert_eq!(parsed.as_slice(), expected.as_slice());
+    }
+
+    #[test]
+    fn empty_input(){
+        let parsed = lexer::tokenize("");
+        let expected = vec![];
+        assert_eq!(parsed.as_slice(), expected.as_slice());
+    }
+
+    #[test]
+    fn parse_bignum(){
+        let parsed = lexer::tokenize("98765432100");
+        let expected = vec![Integer(98765432100)];
+        assert_eq!(parsed.as_slice(), expected.as_slice());
     }
 }
